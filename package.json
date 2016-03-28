@@ -1,0 +1,23 @@
+{
+  "name": "packagingjs",
+  "version": "0.2.1",
+  "description": "ES4 style packaging, namespacing, and dependency implementation for JavaScript.",
+  "main": "packagingjs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "browser",
+    "require",
+	"import",
+	"namespace",
+	"package",
+	"packaging",
+	"packagingjs",
+    "bundle",
+    "npm",
+    "javascript"
+  ],
+  "author": "Bryan Grezeszak <bryangrezeszak@mail.com> (http://mbmedia.cc)",
+  "license": "MIT"
+}
