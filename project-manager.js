@@ -50,11 +50,11 @@ ProjectManager.registerClassFile = function(fullClassName, dependent) // takes f
 	
 	// if not there, add it and update index
 	if (!alreadyThere) {
-		classFiles.push({url:fname, processed:false, code:null, fullClassName:fullClassName, dependson:[], toString:function(){return '[classFiles array object '+this.fullClassName+']';}});
+		classFiles.push({url:fname, processed:false, code:null, map:null, fullClassName:fullClassName, dependson:[], toString:function(){return '[classFiles array object '+this.fullClassName+']';}});
 		index = classFiles.length - 1;
 	}
 	
-	// if this was called from a class importing it, than that class is dependent on this, so track that on its classFiles object
+	// if this was called from a class importing it, then that class is dependent on this, so track that on its classFiles object
 	if (dependent) {
 		var dependentIndex = getClassFilesIndex(dependent);
 		classFiles[dependentIndex].dependson.push(fullClassName);
@@ -94,13 +94,14 @@ ProjectManager.registerClassFile = function(fullClassName, dependent) // takes f
 	}
 }
 
-ProjectManager.registerClassCode = function(fullClassName, code)
+ProjectManager.registerClassCode = function(fullClassName, code, map)
 {
 	var fname = fullClassName.split('.').join('/') + '.js';
 	var index = utils.indexOfPropVal(classFiles, 'url', fname);
 	if (index > -1) {
 		classFiles[index].processed = true;
 		classFiles[index].code = code;
+		classFiles[index].map = map;
 	}
 }
 
