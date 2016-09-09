@@ -21,18 +21,25 @@ utils.isFile = function(fname)
 }
 
 // gets a list of all files in the given dir (no trailing slash in directory path)
-utils.fileList = function(dir)
+utils.fileList = function(dir, exclude)
 {
 	var files = [];
 	
 	for (var i=0,ii=utils.codePackages.length; i<ii; i++)
 	{
 		var root = utils.codePackages[i];
-		var all = fs.readdirSync(root+dir);
+		
+		// will error if folder doesn't exist...which means no files there obviously, so continue to next root
+		try {
+			var all = fs.readdirSync(root+dir);
+		} catch(e) {
+			continue;
+		}
 	
-		for (var i in all)
-			if (!fs.statSync(root+dir+'/'+all[i]).isDirectory() && all[i].substr(-3)==='.js')
+		for (var i in all) {
+			if (!fs.statSync(root+dir+'/'+all[i]).isDirectory() && all[i].substr(-3)==='.js' && dir+'/'+all[i]!==exclude)
 				files.push(all[i]);
+		}
 	}
 	
 	return files;
@@ -74,10 +81,14 @@ utils.indexOfPropVal = function(arr, key, val, start)
 // allows real valid parsing without the inherent problems regex's have (like mixing up strings and such
 // finds the first instance of a character in the string param search as long as not ", ', //, /*, etc
 // use nolook if you don't care about it being surrounded by text, e.g. nolook true 'Xblah' will match blah, otherwise it won't
-utils.nextToken = function(code, token, frm, nolook)
+utils.nextToken = function(code, token, frm, nolook, doRegex, doStrings, doComments)
 {
 	var len = token.length;
 	var ch1 = token.charAt(0);
+	
+	doRegex    = doRegex    !== false;
+	doStrings  = doStrings  !== false;
+	doComments = doComments !== false;
 	
 	var extra = ' '; 
 	while(extra.length < len) extra += ' ';
@@ -99,7 +110,7 @@ utils.nextToken = function(code, token, frm, nolook)
 	for (var i = frm+len, l = str.length; i < l; i++)
 	{
 		if (mode.regex) {
-			if (str[i] === '/' && str[i-1] !== '\\')
+			if (str[i] === '\n' || (str[i] === '/' && str[i-1] !== '\\'))
 				mode.regex = false;
 			continue;
 		}
@@ -123,12 +134,17 @@ utils.nextToken = function(code, token, frm, nolook)
 				mode.blckComment = false;
 			continue;
 		}
- 
-		mode.regex       = str[i] === '/' && str[i+1] !== '/' && str[i+1] !== '*';
-		mode.doubleQuote = str[i] === '"';
-		mode.singleQuote = str[i] === "'";
-		mode.lineComment = str[i] === '/' && str[i+1] === '/';
-		mode.blckComment = str[i] === '/' && str[i+1] === '*';
+		
+		if (doRegex)
+			mode.regex       = str[i] === '/' && str[i+1] !== '/' && str[i+1] !== '*';
+		if (doStrings) {
+			mode.doubleQuote = str[i] === '"';
+			mode.singleQuote = str[i] === "'";
+		}
+		if (doComments) {
+			mode.lineComment = str[i] === '/' && str[i+1] === '/';
+			mode.blckComment = str[i] === '/' && str[i+1] === '*';
+		}
 		
 		if (str[i]==ch1 && str.slice(i, i+len).join('')==token) { // if we found the first char and find it really is an intance of the text...
 			if (str[i+len].match(okChars) != null || nolook) { // look ahead for acceptable character indicating a lone word token (nolook for nonwords)
@@ -150,7 +166,7 @@ utils.lastToken = function(code, token, frm, nolook)
 	
 	while (true)
 	{
-		frm = utils.nextToken(code, token, frm+1, nolook);
+		frm = utils.nextToken(code, token, frm+1, nolook, false, false, true);
 		if (frm > last)
 			last = frm;
 		else

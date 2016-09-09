@@ -119,29 +119,10 @@ ProjectManager.nextClassToProcess = function()
 	return null; // if no more to do
 }
 
-var classShortcuts = []; // holds in format {reference:path.Whatever, shortcut:Name}
-ProjectManager.registerClassShortcut = function(fullClassName, shortcut)
-{
-	var scIndex = utils.indexOfPropVal(classShortcuts, 'shortcut', shortcut);
-	
-	// already same shortcut for same class...leave it be
-	if (scIndex > -1 && classShortcuts[scIndex].reference == fullClassName)
-		return;
-	
-	if (scIndex > -1)
-		throw new Error('Transpiler Error: The class name shortcut '+shortcut+' is utilized more than once.');
-	
-	classShortcuts.push({reference:fullClassName, shortcut:shortcut});
-}
-ProjectManager.getClassShortcuts = function() {
-	return classShortcuts;
-}
-
 ProjectManager.clear = function() {
 	packages = {};
 	jsFiles = [];
 	classFiles = []
-	classShortcuts = [];
 }
 
 module.exports = ProjectManager;

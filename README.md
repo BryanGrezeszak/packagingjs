@@ -216,7 +216,7 @@ package my.namesace
 
 Now the file `my/namespace/MyClass.js` will be expected in one of the defined root paths. It can be imported into other classes as a dependency via the full namespaced name `my.namespace.MyClass`. Once imported it can be referenced via its non-namespaced name `MyClass` within the package where it's imported.
 
-It is good practice to namespace most classes with unique namespaces. One common practice from AS3 (which is a language that implemented the ES4 spec completely) is to use reverse domain namespacing followed by descriptive namespaces that can be used to group like classes. For example, a company at `mywebsite.com` making a class `MyAnimationUtils` might namespace that class as `com.mywebsite.animation.utils.MyAnimationUtils`. Another class that had to do with those utilities might have the same namespace and therefore be in the same folder, or one about animation that was not a utility might be namespaced will all that except the `.utils` and would reside in the parent `animation` folder.
+It is good practice to namespace most classes with unique namespaces. This is less of a concern for classes that are local to a project, but much more of one for classes that are intended to be part of a common library that multiple projects draw from. One possible practice would be domain namespacing followed by descriptive namespaces that can be used to group like classes. For example, a company at `mywebsite.com` making a class `MyAnimationUtils` might namespace that class as `mywebsite.com.animation.utils.MyAnimationUtils`. Another class that had to do with those utilities might have the same namespace and therefore be in the same folder, or one about animation that was not a utility might be namespaced will all that except the `.utils` and would reside in the parent `animation` folder. But there is no strict convention, use your smarts to determine the best way for your stuff.
 
 ----------------
 
@@ -311,7 +311,7 @@ package
 
 -- `package`, `import`, `include`, and `using`, and `as` statements are handled and compiled out and do not exist in the output, so they will not conflict with other current/future JS usages of those keywords which may be implemented in JS engines. Any usages of those keywords after the beginning of your class definition will not be handled by PackagingJS and will be left as you wrote them.
 
--- PackagingJS is designed for compilation, and this module is expected to be used within things like GULP and GRUNT plugins and their respective workflows. There is not any way for PackagingJS formatted files to run without compilation to normal JS, nor is there a way planned. That's just not what this tool is for. My official GULP plugin for this can be found [here](https://www.npmjs.com/package/gulp-packagingjs)
+-- PackagingJS is designed for compilation, and this module is expected to be used within things like Gulp and GRUNT plugins and their respective workflows. There is not any way for PackagingJS formatted files to run without compilation to normal JS, nor is there a way planned. That's just not what this tool is for. My official GULP plugin for this can be found [here](https://www.npmjs.com/package/gulp-packagingjs)
 
 ------------
 
@@ -322,4 +322,6 @@ package
 0.2.0 - Added * wildcard ability to import statement.\
 0.2.1 - Bugfixes related to the code roots.\
 0.3.0 - Added non-quoted no-file-extension format to include.\
-0.4.0 - Added sourcemaps and made large changes to how classes are recognized.
+0.4.0 - Added sourcemaps and made large changes to how classes are recognized.\
+0.4.1 - Some parsing bugfixes for finding end of package.\
+next  - Bugfix for filesystem searching with multiple roots. Bugfix for import wildcards and excluding self.

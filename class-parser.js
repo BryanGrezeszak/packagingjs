@@ -60,7 +60,17 @@ function ClassParser()
 		var openingCurly = utils.nextToken(code, '{', packageInd, true); //code.indexOf('{', packageInd);
 		var closingCurly = utils.lastToken(code, '}', openingCurly, true); //code.lastIndexOf('}');
 		
-		if (packageInd < 0) throw new Error("packagingjs error: Class "+this.className+", class package not found.");
+		// this is the only thing that requires any parsing after the opening of the class (parses to ignores comments which may exist after package closes)
+		// since we're trying to avoid that, if it doesn't find a closing curly then we'll just consider the last index of } at all to be the curly
+		if (closingCurly === -1)
+			closingCurly = code.lastIndexOf('}');
+		
+		// if that failed too then make that an error
+		if (closingCurly === -1)
+			throw new Error("packagingjs error: Closing curly brace for package not found in class "+this.className+".");
+		
+		if (packageInd < 0)
+				throw new Error("packagingjs error: Class "+this.className+", class package not found.");
 		
 		this.packageName = utils.removeComments(code.substring(packageInd+7, openingCurly)).trim();
 		this.fullClassName = this.packageName.length>0 ? this.packageName+'.'+this.className : this.className;
@@ -209,7 +219,7 @@ function ClassParser()
 			// if is explicit (blah.blah.Class) then register, if is wildcard (blah.blah.*) don't register, just make the additions
 			// that will be tacked on at the end of this function which are the import statements of all .js files in that dir
 			if (last === '*') {
-				var fileList = utils.fileList(splt.join('/').trim());
+				var fileList = utils.fileList(splt.join('/').trim(), this.fullClassName.split('.').join('/')+'.js');
 				var len = fileList.length;
 				while (len--)
 					additions += 'import ' + pckNm + '.' + fileList[len].replace(/\.js$/,'') + '; '; // put on same line so can track for sourcemaps as all being from same line
@@ -272,7 +282,6 @@ function ClassParser()
 			this.requiredClasses.push(parts[0].trim());
 			
 			if (val.match(/\sas\s/)) { // if is an "as" import
-				ProjectManager.registerClassShortcut(parts[0], parts[1]);
 				this.classShortcuts.push(new StringLine('var '+parts[1].trim()+' = '+parts[0].trim()+';', this.imports[i].line));
 			}
 			else if (val.split('.').length > 1) { // otherwise just auto-imply the class name as shortcut IF it actually has a namespace

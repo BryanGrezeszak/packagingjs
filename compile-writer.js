@@ -89,28 +89,4 @@ CompileWriter.getClasses = function()
 	return retObj;
 }
 
-// outputs a list of all shortcuts from "import blah as blah", for global usage
-// not currently used (each class only sees its own "import as" stuff)
-// TODO: marked for removal after testing for a while commented out
-/*
-CompileWriter.getClassShortcuts = function()
-{
-	var scObjArr = ProjectManager.getClassShortcuts();
-	
-	if (scObjArr.length < 1)
-		return '';
-	
-	var scArr = [];
-	scArr.push("////////// BEGIN class shortcuts //////////");
-	
-	for (var i=0,ii=scObjArr.length; i<ii; i++) {
-		scArr.push('var '+scObjArr[i].shortcut+' = '+scObjArr[i].reference+';');
-	}
-	
-	scArr.push("////////// END class shortcuts //////////");
-	
-	return scArr.join(utils.LINE_BREAK);
-}
-*/
-
 module.exports = CompileWriter;
